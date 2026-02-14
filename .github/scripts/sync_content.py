@@ -60,18 +60,26 @@ def extract_metadata_from_path(filepath, source_root):
     }
     
     # Parse path: {year}/{source_lang}/{prompt_id}/{target_lang}/{author_type_source.md}
+    # OR: {year}/{source_lang}/{prompt_id}/{author_type_source.md} (direct in prompt folder)
     if len(parts) >= 5:
         metadata['year'] = parts[0]
         metadata['source_language'] = parts[1]
         metadata['prompt_id'] = parts[2]
         metadata['target_language'] = parts[3]
-        
-        # Parse filename: author_type_source.md
-        filename = filepath.stem
-        filename_parts = filename.split('_')
-        if len(filename_parts) >= 2:
-            metadata['author'] = filename_parts[0]
-            metadata['content_type'] = filename_parts[1] if len(filename_parts) > 1 else 'writing'
+    elif len(parts) == 4:
+        # File is directly in prompt folder (no target language subfolder)
+        metadata['year'] = parts[0]
+        metadata['source_language'] = parts[1]
+        metadata['prompt_id'] = parts[2]
+        # Target language same as source for these cases
+        metadata['target_language'] = parts[1]
+    
+    # Parse filename: author_type_source.md
+    filename = filepath.stem
+    filename_parts = filename.split('_')
+    if len(filename_parts) >= 2:
+        metadata['author'] = filename_parts[0]
+        metadata['content_type'] = filename_parts[1] if len(filename_parts) > 1 else 'writing'
     
     return metadata
 
@@ -125,6 +133,11 @@ def process_content_file(source_file, source_root, target_root):
     try:
         # Extract metadata
         metadata = extract_metadata_from_path(source_file, source_root)
+        
+        # Skip if essential metadata is missing
+        if not metadata.get('year') or not metadata.get('author'):
+            print(f"⚠ Skipping {source_file.relative_to(source_root)}: insufficient metadata")
+            return False
         
         # Read original content
         with open(source_file, 'r', encoding='utf-8') as f:
