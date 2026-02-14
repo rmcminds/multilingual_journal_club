@@ -1,0 +1,68 @@
+name: Sync Content to The Cnidae Gritty Blog
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'prompts/**'
+      - '!prompts/**/*_draft*'
+      - '!prompts/**/_drafts/**'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  sync-content:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Multilingual Journal Club
+        uses: actions/checkout@v4
+        with:
+          path: multilingual_journal_club
+          fetch-depth: 0  # Full history for better metadata
+      
+      - name: Checkout The Cnidae Gritty Blog
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.BLOG_REPO_NAME }}  # e.g., 'rmcminds/thecnidaegritty'
+          token: ${{ secrets.BLOG_SYNC_TOKEN }}
+          path: blog
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Install dependencies
+        run: |
+          pip install pyyaml python-frontmatter
+      
+      - name: Process and sync content
+        run: |
+          python multilingual_journal_club/.github/scripts/sync_content.py
+        env:
+          SOURCE_DIR: multilingual_journal_club/prompts
+          TARGET_DIR: blog/_data/journal_club
+          COMMIT_SHA: ${{ github.sha }}
+      
+      - name: Commit changes to blog
+        run: |
+          cd blog
+          git config user.name "Journal Club Sync Bot"
+          git config user.email "bot@thecnidaegritty.org"
+          git add _data/journal_club/
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Sync journal club content from ${{ github.sha }}"
+            git push
+          fi
+      
+      - name: Create summary
+        run: |
+          echo "### Content Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Successfully synced content to The Cnidae Gritty blog" >> $GITHUB_STEP_SUMMARY
+          echo "- Source commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
