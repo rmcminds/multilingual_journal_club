@@ -1,2 +1,5 @@
 *DS_Store
 *_draft
+__pycache__/
+*.pyc
+*.pyo
