@@ -1,0 +1,96 @@
+---
+layout: default
+---
+
+<article class="journal-club-post">
+  <header class="post-header">
+    <h1 class="post-title">{{ page.title }}</h1>
+    
+    <div class="post-meta">
+      <span class="author">
+        <i class="icon-user"></i> {{ page.author }}
+      </span>
+      <span class="date">
+        <i class="icon-calendar"></i> {{ page.date | date: "%B %-d, %Y" }}
+      </span>
+      <span class="language">
+        <i class="icon-globe"></i> {{ page.language }}
+      </span>
+    </div>
+    
+    {% if page.prompt_id %}
+    <div class="prompt-info">
+      <strong>Prompt:</strong> {{ page.prompt_id }} 
+      <span class="language-pair">({{ page.source_language }} → {{ page.language }})</span>
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <footer class="post-footer">
+    <div class="post-about">
+      <h3>About this post</h3>
+      <p>
+        This {{ page.content_type }} is part of the 
+        <a href="/journal-club/">Multilingual Journal Club</a> series, 
+        where scientists practice language and communication skills by 
+        writing about peer-reviewed research in various languages.
+      </p>
+      <p>
+        <a href="https://github.com/rmcminds/multilingual_journal_club" 
+           target="_blank" 
+           rel="noopener">
+          Join the journal club →
+        </a>
+      </p>
+    </div>
+    
+    {% if page.tags.size > 0 %}
+    <div class="tags">
+      <strong>Tags:</strong>
+      {% for tag in page.tags %}
+        <a href="/journal-club/tags/{{ tag | slugify }}/" class="tag">{{ tag }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="post-navigation">
+      {% if page.previous %}
+      <div class="nav-previous">
+        <a href="{{ page.previous.url }}">
+          ← Previous: {{ page.previous.title }}
+        </a>
+      </div>
+      {% endif %}
+      
+      {% if page.next %}
+      <div class="nav-next">
+        <a href="{{ page.next.url }}">
+          Next: {{ page.next.title }} →
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </footer>
+</article>
+
+{% if site.disqus %}
+<div class="comments">
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = "{{ site.url }}{{ page.url }}";
+      this.page.identifier = "{{ page.journal_club_id }}";
+    };
+    (function() {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://{{ site.disqus }}.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+</div>
+{% endif %}

@@ -10,6 +10,10 @@ Participation is hoped to:
 4. provide content that can communicate science to the public
 5. familiarize us with version control and collaboration on GitHub!
 
+**📚 New to contributing?** Check out our [Contributing Guide](CONTRIBUTING.md) for step-by-step instructions!
+
+**🏗️ Interested in the architecture?** See [ARCHITECTURE.md](ARCHITECTURE.md) for details on how this repository integrates with [The Cnidae Gritty](https://thecnidaegritty.org) blog.
+
 # Getting started
 
 Note: *if you're not comfortable with GitHub, and learning it on top of language and science is too confusing, feel free to look at the articles, write your reviews, and exchange them with a partner via any means you're comfortable with.*
